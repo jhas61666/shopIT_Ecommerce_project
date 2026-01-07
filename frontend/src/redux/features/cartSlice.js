@@ -1,12 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    cartItems: localStorage.getItem("cartItems") 
-        ? JSON.parse(localStorage.getItem("cartItems")) 
+    cartItems: localStorage.getItem("cartItems")
+        ? JSON.parse(localStorage.getItem("cartItems"))
         : [],
 
-    shippingInfo: localStorage.getItem("shippingInfo") 
-        ? JSON.parse(localStorage.getItem("shippingInfo")) 
+    shippingInfo: localStorage.getItem("shippingInfo")
+        ? JSON.parse(localStorage.getItem("shippingInfo"))
         : {},
 }
 
@@ -31,6 +31,10 @@ export const cartSlice = createSlice({
             state.cartItems = state?.cartItems?.filter((i) => i.product !== action.payload);
             localStorage.setItem("cartItems", JSON.stringify(state.cartItems));
         },
+        clearCart: (state, action) => {
+            localStorage.removeItem("cartItems");
+            state.cartItems = [];
+        },
         // 2. Add the saveShippingInfo reducer here
         saveShippingInfo: (state, action) => {
             state.shippingInfo = action.payload;
@@ -42,4 +46,4 @@ export const cartSlice = createSlice({
 export default cartSlice.reducer;
 
 // 3. Export saveShippingInfo so Shipping.jsx can use it
-export const { setCartItem, removeCartItem, saveShippingInfo } = cartSlice.actions;
+export const { setCartItem, removeCartItem, saveShippingInfo, clearCart } = cartSlice.actions;

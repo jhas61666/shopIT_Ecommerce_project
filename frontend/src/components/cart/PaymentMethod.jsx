@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { caluclateOrderCost } from "../../helpers/helpers";
-import { useCreateNewOrderMutation } from "../../redux/api/orderApi";
+import { useCreateNewOrderMutation, useStripeCheckoutSessionMutation } from "../../redux/api/orderApi";
 
 const PaymentMethod = () => {
   const [method, setMethod] = useState("");
@@ -13,36 +13,51 @@ const PaymentMethod = () => {
 
   const { cartItems, shippingInfo } = useSelector((state) => state.cart);
 
-  const [createNewOrder, { isLoading, error, isSuccess }] =
+  // 1. Mutation for Cash on Delivery
+  const [createNewOrder, { isLoading: isCodLoading, error: codError, isSuccess }] =
     useCreateNewOrderMutation();
 
-  // Handle Order Success or Error
+  // 2. Mutation for Stripe Card Payment
+  const [stripeCheckoutSession, { data: stripeData, error: checkoutError, isLoading: isStripeLoading }] = 
+    useStripeCheckoutSessionMutation();
+
+  // Combined loading state for the button
+  const isLoading = isCodLoading || isStripeLoading;
+
+  // Handle Stripe Session Redirection
   useEffect(() => {
-    if (error) {
-      toast.error(error?.data?.message || "Order failed. Please try again.");
+    if (stripeData?.url) {
+      window.location.href = stripeData.url;
+    }
+
+    if (checkoutError) {
+      toast.error(checkoutError?.data?.message || "Stripe Session Failed");
+    }
+  }, [stripeData, checkoutError]);
+
+  // Handle COD Order Success or Error
+  useEffect(() => {
+    if (codError) {
+      toast.error(codError?.data?.message || "Order failed. Please try again.");
     }
 
     if (isSuccess) {
-      navigate("/me/orders");
+      navigate("/me/orders?order_success=true");
       toast.success("Order Placed Successfully!");
     }
-  }, [error, isSuccess, navigate]);
+  }, [codError, isSuccess, navigate]);
 
   const submitHandler = (e) => {
     e.preventDefault();
 
-    // 1. Validation: Ensure a method is selected
     if (!method) {
       toast.error("Please select a payment method");
       return;
     }
 
-    // 2. Calculate Costs
-    const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
-      caluclateOrderCost(cartItems);
+    const { itemsPrice, shippingPrice, taxPrice, totalPrice } = caluclateOrderCost(cartItems);
 
     if (method === "COD") {
-      // 3. Prepare Order Data for Backend
       const orderData = {
         shippingInfo,
         orderItems: cartItems,
@@ -56,13 +71,20 @@ const PaymentMethod = () => {
         paymentMethod: "COD",
       };
 
-      // 4. Call API Mutation
       createNewOrder(orderData);
-    } 
-    
+    }
+
     if (method === "Card") {
-      // Logic for Card Payment (Stripe)
-      navigate("/payment");
+      const orderData = {
+        shippingInfo,
+        orderItems: cartItems,
+        itemsPrice: Number(itemsPrice),
+        shippingAmount: Number(shippingPrice),
+        taxAmount: Number(taxPrice),
+        totalAmount: Number(totalPrice),
+      };
+
+      stripeCheckoutSession(orderData);
     }
   };
 
@@ -113,7 +135,7 @@ const PaymentMethod = () => {
               className="btn btn-primary py-2 w-100 mt-4"
               disabled={isLoading}
             >
-              {isLoading ? "Processing Order..." : "CONTINUE"}
+              {isLoading ? "Processing..." : "CONTINUE"}
             </button>
           </form>
         </div>
