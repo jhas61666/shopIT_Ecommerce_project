@@ -17,7 +17,7 @@ import ConfirmOrder from "../cart/ConfirmOrder"
 import PaymentMethod from "../cart/PaymentMethod"
 import MyOrders from "../order/MyOrders"
 import OrderDetails from "../order/OrderDetails"
-import Invoice from "../invoice/invoice"
+import Invoice from "../invoice/Invoice"
 
 
 const userRoutes = () => {
