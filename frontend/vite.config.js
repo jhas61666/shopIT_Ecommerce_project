@@ -11,5 +11,18 @@ export default defineConfig({
         secure: false,
       }
     }
-  }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Group critical React and Redux libraries together
+          'vendor-react': ['react', 'react-dom', 'react-router-dom', 'react-redux', '@reduxjs/toolkit'],
+          // Keep the heavy PDF and Chart tools separate
+          'vendor-utils': ['jspdf', 'html2canvas', 'chart.js'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000, 
+  },
 })

@@ -6,8 +6,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node backend/app.js",
-    "dev": "SET NODE_ENV=DEVELOPMENT& nodemon backend/app.js",
-    "prod": "SET NODE_ENV=PRODUCTION& node backend/app.js",
+    "dev": "cross-env NODE_ENV=DEVELOPMENT nodemon backend/app.js",
+    "prod": "cross-env NODE_ENV=PRODUCTION node backend/app.js",
     "seeder": "node backend/seeder/seeder.js"
   },
   "author": "Sachin Jha",
@@ -17,6 +17,7 @@
     "cloudinary": "^2.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
