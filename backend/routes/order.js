@@ -1,5 +1,5 @@
 import express from "express";
-import { allOrders, deleteOrder, getOrderDetaills, myOrders, newOrder, updateOrder } from "../controllers/orderControllers.js";
+import { allOrders, deleteOrder, getOrderDetaills, getSales, myOrders, newOrder, updateOrder } from "../controllers/orderControllers.js";
 import { authorizeRoles, isAuthenticatedUser } from "../middlewares/auth.js";
 
 const router = express.Router();
@@ -7,6 +7,11 @@ const router = express.Router();
 router.route("/orders/new").post(isAuthenticatedUser, newOrder);
 router.route("/orders/:id").get(isAuthenticatedUser, getOrderDetaills);
 router.route("/me/orders").get(isAuthenticatedUser, myOrders);
+
+router
+    .route("/admin/get_sales")
+    .get(isAuthenticatedUser, authorizeRoles("admin"), getSales);
+
 
 router
     .route("/admin/orders")

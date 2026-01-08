@@ -157,3 +157,46 @@ export const deleteOrder = catchAsyncErrors(async (req, res, next) => {
         success: true,
     })
 })
+
+
+// Get Sales Data => /api/v1/admin/get_sales
+export const getSales = catchAsyncErrors(async (req, res, next) => {
+    const startDate = new Date(req.query.startDate);
+    const endDate = new Date(req.query.endDate);
+
+    startDate.setUTCHours(0, 0, 0, 0);
+    endDate.setUTCHours(23, 59, 59, 999);
+
+    const salesData = await Order.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $gte: startDate,
+                    $lte: endDate,
+                },
+            },
+        },
+        {
+            $group: {
+                _id: {
+                    date: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                },
+                totalSales: { $sum: "$totalAmount" },
+                numOrders: { $sum: 1 },
+            },
+        },
+        { $sort: { "_id.date": 1 } } // Sort by date ascending
+    ]);
+
+    // Format the data for the frontend chart
+    const finalSalesData = salesData.map(item => ({
+        date: item._id.date,
+        sales: item.totalSales,
+        orders: item.numOrders
+    }));
+
+    res.status(200).json({
+        success: true,
+        salesData: finalSalesData,
+    });
+});

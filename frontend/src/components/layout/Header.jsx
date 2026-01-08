@@ -23,16 +23,16 @@ const Header = () => {
     const [logout] = useLazyLogoutQuery();
 
     const logoutHandler = async () => {
-    try {
-        await logout(); // Attempt server-side logout
-    } catch (err) {
-        console.error("Logout request failed", err);
-    } finally {
-        // Always clear local state regardless of server response
-        localStorage.removeItem('isLoggedIn');
-        window.location.href = "/"; 
-    }
-};
+        try {
+            await logout(); // Attempt server-side logout
+        } catch (err) {
+            console.error("Logout request failed", err);
+        } finally {
+            // Always clear local state regardless of server response
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = "/";
+        }
+    };
 
 
     return (
@@ -74,7 +74,11 @@ const Header = () => {
                             <span>{user?.name}</span>
                         </button>
                         <div className="dropdown-menu w-100" aria-labelledby="dropDownMenuButton">
-                            <Link className="dropdown-item" to="/admin/dashboard"> Dashboard </Link>
+                            
+                            {user?.role === 'admin' && (
+                                <Link className="dropdown-item" to="/admin/dashboard"> Dashboard </Link>
+
+                            )}
 
                             <Link className="dropdown-item" to="/me/orders"> Orders </Link>
 
