@@ -36,7 +36,11 @@ const Invoice = () => {
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF();
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, 0);
+      // Calculate height to maintain aspect ratio
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`invoice_${order?._id}.pdf`);
     });
   };
@@ -80,7 +84,7 @@ const Invoice = () => {
               </div>
               <div>
                 <span>DATE</span>{" "}
-                {new Date(order?.createdAt).toLocaleString("en-US")}
+                {order?.createdAt ? new Date(order?.createdAt).toLocaleString("en-US") : "N/A"}
               </div>
               <div><span>STATUS</span> {paymentInfo?.status}</div>
             </div>
@@ -108,22 +112,22 @@ const Invoice = () => {
                 ))}
 
                 <tr>
-                  <td colspan="4"><b>SUBTOTAL</b></td>
+                  <td colSpan="4"><b>SUBTOTAL</b></td>
                   <td className="total">${itemsPrice}</td>
                 </tr>
 
                 <tr>
-                  <td colspan="4"><b>TAX</b></td>
+                  <td colSpan="4"><b>TAX</b></td>
                   <td className="total">${taxAmount}</td>
                 </tr>
 
                 <tr>
-                  <td colspan="4"><b>SHIPPING</b></td>
+                  <td colSpan="4"><b>SHIPPING</b></td>
                   <td className="total">${shippingAmount}</td>
                 </tr>
 
                 <tr>
-                  <td colspan="4" className="grand total"><b>GRAND TOTAL</b></td>
+                  <td colSpan="4" className="grand total"><b>GRAND TOTAL</b></td>
                   <td className="grand total">${totalAmount}</td>
                 </tr>
               </tbody>

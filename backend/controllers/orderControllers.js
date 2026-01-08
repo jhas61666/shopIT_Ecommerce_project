@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js"
 import Order from "../models/order.js";
 import Product from "../models/product.js"
-import ErrorHandler from "../utils/errorHandler.js";
+import ErrorHandler from "../utils/ErrorHandler.js";
 
 // Create new Order => /api/v1/orders/new
 export const newOrder = catchAsyncErrors(async (req, res, next) => {

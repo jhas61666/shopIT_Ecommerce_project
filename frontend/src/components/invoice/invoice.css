@@ -32,7 +32,7 @@
   font-weight: normal;
   text-align: center;
   margin: 0 0 20px 0;
-  background: url(../../public/images/dimension.png);
+  background: url(/images/dimension.png);
 }
 
 #project {
@@ -119,4 +119,22 @@
   border-top: 1px solid #c1ced9;
   padding: 8px 0;
   text-align: center;
+}
+
+
+
+@media print {
+  /* Hide the download button and everything except the invoice area */
+  .btn, .navbar, .header, footer {
+    display: none !important;
+  }
+
+  .order-invoice {
+    margin: 0;
+    padding: 0;
+  }
+
+  #order_invoice {
+    border: none !important;
+  }
 }

@@ -9,7 +9,7 @@ export const userApi = createApi({
     credentials: "include",
   }),
 
-  tagTypes: ["User"],
+  tagTypes: ["User", "AdminUsers"],
 
   endpoints: (builder) => ({
     getMe: builder.query({
@@ -92,7 +92,7 @@ export const userApi = createApi({
         }
       }
     }),
-     resetPassword: builder.mutation({
+    resetPassword: builder.mutation({
       query({ token, body }) {
         return {
           url: `/password/reset/${token}`,
@@ -100,7 +100,38 @@ export const userApi = createApi({
           body,
         }
       }
-    })
+    }),
+    getAdminUsers: builder.query({
+      query: () => `/admin/users`,
+      providesTags: ["AdminUsers"]
+    }),
+
+    getUserDetails: builder.query({
+      query: (id) => `/admin/users/${id}`,
+      providesTags: ["AdminUsers"], // Or use a specific tag like ["User"]
+    }),
+
+    updateUser: builder.mutation({
+      query({ id, body }) {
+        return {
+          url: `/admin/users/${id}`,
+          method: "PUT",
+          body,
+        };
+      },
+      invalidatesTags: ["AdminUsers"],
+    }),
+
+    deleteUser: builder.mutation({
+      query(id) {
+        return {
+          url: `/admin/users/${id}`,
+          method: "DELETE",
+        
+        };
+      },
+      invalidatesTags: ["AdminUsers"],
+    }),
   }),
 });
 
@@ -110,5 +141,9 @@ export const {
   useUploadAvatarMutation,
   useUpdatePasswordMutation,
   useForgotPasswordMutation,
-  useResetPasswordMutation
+  useResetPasswordMutation,
+  useGetAdminUsersQuery,
+  useGetUserDetailsQuery,
+  useUpdateUserMutation,
+  useDeleteUserMutation,
 } = userApi;

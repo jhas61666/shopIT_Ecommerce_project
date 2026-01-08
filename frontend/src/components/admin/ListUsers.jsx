@@ -6,12 +6,13 @@ import { MDBDataTable } from 'mdbreact';
 import MetaData from '../layout/MetaData';
 import AdminLayout from '../layout/AdminLayout';
 import { useDeleteOrderMutation, useGetAdminOrdersQuery } from '../../redux/api/orderApi';
+import { useDeleteUserMutation, useGetAdminUsersQuery } from '../../redux/api/userApi';
 
-const ListOrders = () => {
+const ListUsers = () => {
     const navigate = useNavigate();
-    const { data, isLoading, error } = useGetAdminOrdersQuery();
+    const { data, isLoading, error } = useGetAdminUsersQuery();
 
-   const [deleteOrder, { error: deleteError, isLoading: isDeleteLoading, isSuccess }] = useDeleteOrderMutation();
+    const [deleteUser, { error: deleteError, isLoading: isDeleteLoading, isSuccess }] = useDeleteUserMutation();
 
     useEffect(() => {
         if (error) {
@@ -23,42 +24,44 @@ const ListOrders = () => {
         }
 
         if (isSuccess) {
-            toast.success("Order Deleted Successfully");
+            toast.success("User Deleted Successfully");
             navigate("/admin/orders");
         }
 
 
-    }, [error, deleteError, isSuccess]);
+    }, [error]);
 
-    const deleteOrderHandler = (id) => {
-        deleteOrder(id)
+    const deleteUserHandler = (id) => {
+        deleteUser(id)
     }
 
     // useMemo prevents the table from regenerating on every tiny render
-    const setOrders = useMemo(() => {
-        const orders = {
+    const setUsers = useMemo(() => {
+        const users = {
             columns: [
                 { label: "ID", field: "id", sort: "asc" },
-                { label: "Payment Status", field: "paymentStatus", sort: "asc" },
-                { label: "Order Status", field: "orderStatus", sort: "asc" },
+                { label: "Name", field: "name", sort: "asc" },
+                { label: "Email", field: "email", sort: "asc" },
+                { label: "Role", field: "role", sort: "asc" },
                 { label: "Actions", field: "actions", sort: "asc" },
             ],
             rows: [],
         };
 
-        data?.orders?.forEach((order) => {
-            orders.rows.push({
-                id: order?._id,
-                paymentStatus: order?.paymentInfo?.status?.toUpperCase(),
-                orderStatus: order?.orderStatus,
+        data?.users?.forEach((user) => {
+            users.rows.push({
+                id: user?._id,
+                name: user?.name,
+                email: user?.email,
+                role: user?.role,
                 actions: (
                     <>
-                        <Link to={`/admin/orders/${order?._id}`} className="btn btn-outline-primary">
+                        <Link to={`/admin/users/${user?._id}`} className="btn btn-outline-primary">
                             <i className="fa fa-pencil"></i>
                         </Link>
 
                         <button className="btn btn-outline-danger ms-2"
-                         onClick={() => deleteOrderHandler(order?._id)} 
+                         onClick={() => deleteUserHandler(user?._id)} 
                          disabled={isDeleteLoading}
                         >
                             <i className="fa fa-trash"></i>
@@ -68,19 +71,19 @@ const ListOrders = () => {
             });
         });
 
-        return orders;
+        return users;
     }, [data]);
 
     if (isLoading) return <Loader />;
 
     return (
         <AdminLayout>
-            <MetaData title={'All Orders'} />
+            <MetaData title={'All Users'} />
 
-            <h1 className="my-5">{data?.orders?.length || 0} Orders</h1>
+            <h1 className="my-5">{data?.users?.length || 0} Users</h1>
 
             <MDBDataTable
-                data={setOrders}
+                data={setUsers}
                 className='px-3'
                 bordered
                 striped
@@ -90,4 +93,4 @@ const ListOrders = () => {
     );
 };
 
-export default ListOrders;
+export default ListUsers;
